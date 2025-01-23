@@ -1,9 +1,16 @@
+import useCommonForm from "@/hooks/useCommonForm";
+import axios from "axios";
 import React from "react";
-import { Form } from "react-bootstrap";
+import { Button, Form } from "react-bootstrap";
 import { Controller } from "react-hook-form";
 
-const RenderCorrectAnswerField = ({ questionType, errors, control }) => {
-  
+const RenderCorrectAnswerField = ({
+  questionType,
+  errors,
+  control,
+  translateToBengali,
+}) => {
+  const { loading, setLoading, token, t, setGlobalError } = useCommonForm();
   switch (questionType) {
     case "FILL_BLANK":
     case "NUMERICAL":
@@ -21,6 +28,25 @@ const RenderCorrectAnswerField = ({ questionType, errors, control }) => {
               />
             )}
           />
+          {translateToBengali && (
+            <Form.Group className="mt-3">
+              <Form.Label>Translation in Bengali:</Form.Label>
+              <Controller
+                name="correct_answer_bn"
+                control={control}
+                render={({ field }) => (
+                  <Form.Control
+                    type={questionType === "NUMERICAL" ? "number" : "text"}
+                    isInvalid={!!errors.correct_answer_bn}
+                    {...field}
+                  />
+                )}
+              />
+              <Form.Control.Feedback type="invalid">
+                {errors.correct_answer_bn?.message}
+              </Form.Control.Feedback>
+            </Form.Group>
+          )}
         </>
       );
     case "TRUE_FALSE":
@@ -60,23 +86,26 @@ const RenderCorrectAnswerField = ({ questionType, errors, control }) => {
               />
             )}
           />
-        </>
-      );
-    case "NUMERICAL":
-      return (
-        <>
-          <Form.Label>Correct Answer:</Form.Label>
-          <Controller
-            name="correct_answer"
-            control={control}
-            render={({ field }) => (
-              <Form.Control
-                type="number"
-                isInvalid={!!errors.correct_answer}
-                {...field}
+          {translateToBengali && (
+            <Form.Group className="mt-3">
+              <Form.Label>Translation in Bengali:</Form.Label>
+              <Controller
+                name="correct_answer_bn"
+                control={control}
+                render={({ field }) => (
+                  <Form.Control
+                    as="textarea"
+                    rows={4}
+                    isInvalid={!!errors.correct_answer_bn}
+                    {...field}
+                  />
+                )}
               />
-            )}
-          />
+              <Form.Control.Feedback type="invalid">
+                {errors.correct_answer_bn?.message}
+              </Form.Control.Feedback>
+            </Form.Group>
+          )}
         </>
       );
     case "ORDERING":
@@ -96,6 +125,26 @@ const RenderCorrectAnswerField = ({ questionType, errors, control }) => {
               />
             )}
           />
+          {translateToBengali && (
+            <Form.Group className="mt-3">
+              <Form.Label>Translation in Bengali:</Form.Label>
+              <Controller
+                name="correct_answer_bn"
+                control={control}
+                render={({ field }) => (
+                  <Form.Control
+                    as="textarea"
+                    rows={4}
+                    isInvalid={!!errors.correct_answer_bn}
+                    {...field}
+                  />
+                )}
+              />
+              <Form.Control.Feedback type="invalid">
+                {errors.correct_answer_bn?.message}
+              </Form.Control.Feedback>
+            </Form.Group>
+          )}
         </>
       );
     case "MATCHING":

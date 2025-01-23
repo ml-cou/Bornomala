@@ -23,6 +23,7 @@ import {
   FetchDropdownData,
   QuestionSchema,
   ExtractDetailedErrorMessage,
+  CONTAINS_QUESTION,
 } from "@/pages/questions/utils";
 import RenderCorrectAnswerField from "./RenderCorrectAnswerField";
 import NestedMCQOptions from "./NestedMCQOptions";
@@ -109,9 +110,8 @@ const UniversityQuestionForm = forwardRef(
     }, [token]);
 
     const onSubmitForm = async (data) => {
-      // console.log(data);
       // return;
-      // setLoading(true);
+      setLoading(true);
       try {
         const promises = [];
         for (let i = 0; i < data.questions.length; i++) {
@@ -315,7 +315,12 @@ const UniversityQuestionForm = forwardRef(
                 <div key={question.id} className="card mb-3 shadow-sm">
                   <div className="card-body">
                     <div className="d-flex justify-content-between align-items-center mb-3">
-                      <h5 className="card-title mb-0">Question {index + 1}</h5>
+                      <h5 className="card-title mb-0">
+                        Question {index + 1}{" "}
+                        <span style={{ fontSize: "12px", marginLeft: "5px" }}>
+                          {question.question_type}
+                        </span>{" "}
+                      </h5>
                       <div className="btn-group">
                         <button
                           type="button"
@@ -394,6 +399,7 @@ export const QuestionModal = ({
 }) => {
   const { token, setGlobalError } = useCommonForm();
   const [loading, setLoading] = useState(false);
+  const [translateToBengali, setTranslateToBengali] = useState(false);
 
   const {
     control,
@@ -416,7 +422,7 @@ export const QuestionModal = ({
       difficulty_level: "",
       options: [{ option_text: "" }, { option_text: "" }],
       explanations: [],
-      sub_sub_topic: "",
+      sub_sub_topic: [],
     },
   });
 
@@ -437,7 +443,7 @@ export const QuestionModal = ({
         difficulty_level: "",
         options: [{ option_text: "" }, { option_text: "" }],
         explanations: [],
-        sub_sub_topic: "",
+        sub_sub_topic: [],
       });
     }
   }, [show, initialData, reset]);
@@ -469,7 +475,7 @@ export const QuestionModal = ({
         }
       );
 
-      setValue(`explanations.${index}.video`, response.data.media_link);
+      setValue(`explanations.${index}.video_url`, response.data.media_link);
       setValue(`explanations.${index}.filename`, file.name);
     } catch (error) {
       console.error("Error uploading file:", error);
@@ -587,115 +593,39 @@ export const QuestionModal = ({
           </Row>
 
           <Row className="mb-3">
-            <Col md={4}>
-              <Form.Group controlId={`sub_sub_topic1`}>
-                <Form.Label>Sub Sub Topic 1:</Form.Label>
-                <Controller
-                  name={`sub_sub_topic1`}
-                  control={control}
-                  disabled={!subTopic}
-                  render={({ field }) => (
-                    <Form.Select
-                      {...field}
-                      isInvalid={!!errors?.sub_sub_topic1}
-                    >
-                      <option value="">-- Select Sub Subtopic --</option>
-                      {dropdownData.subSubTopics
-                        .filter((val) => val.sub_topic == subTopic)
-                        .map((opt) => (
-                          <option key={opt.value} value={opt.value}>
-                            {opt.label}
-                          </option>
-                        ))}
-                    </Form.Select>
-                  )}
-                />
-                <Form.Control.Feedback type="invalid">
-                  {errors?.sub_sub_topic1?.message}
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-            <Col md={4}>
-              <Form.Group controlId={`sub_sub_topic2`}>
-                <Form.Label>Sub Sub Topic 2:</Form.Label>
-                <Controller
-                  name={`sub_sub_topic2`}
-                  control={control}
-                  disabled={!subTopic}
-                  render={({ field }) => (
-                    <Form.Select
-                      {...field}
-                      isInvalid={!!errors?.sub_sub_topic2}
-                    >
-                      <option value="">-- Select Sub Subtopic --</option>
-                      {dropdownData.subSubTopics
-                        .filter((val) => val.sub_topic == subTopic)
-                        .map((opt) => (
-                          <option key={opt.value} value={opt.value}>
-                            {opt.label}
-                          </option>
-                        ))}
-                    </Form.Select>
-                  )}
-                />
-                <Form.Control.Feedback type="invalid">
-                  {errors?.sub_sub_topic2?.message}
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-            <Col md={4}>
-              <Form.Group controlId={`sub_sub_topic3`}>
-                <Form.Label>Sub Sub Topic 3:</Form.Label>
-                <Controller
-                  name={`sub_sub_topic3`}
-                  control={control}
-                  disabled={!subTopic}
-                  render={({ field }) => (
-                    <Form.Select
-                      {...field}
-                      isInvalid={!!errors?.sub_sub_topic3}
-                    >
-                      <option value="">-- Select Sub Subtopic --</option>
-                      {dropdownData.subSubTopics
-                        .filter((val) => val.sub_topic == subTopic)
-                        .map((opt) => (
-                          <option key={opt.value} value={opt.value}>
-                            {opt.label}
-                          </option>
-                        ))}
-                    </Form.Select>
-                  )}
-                />
-                <Form.Control.Feedback type="invalid">
-                  {errors?.sub_sub_topic3?.message}
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-          </Row>
-
-          <Row className="mb-3">
             <Col md={6}>
-              <Form.Group controlId={`difficulty_level`}>
-                <Form.Label>Difficulty:</Form.Label>
+              <Form.Group controlId={`sub_sub_topic`}>
+                <Form.Label>Sub Sub Topic:</Form.Label>
                 <Controller
-                  name={`difficulty_level`}
+                  name="sub_sub_topic"
                   control={control}
-                  render={({ field }) => (
-                    <Form.Select
-                      {...field}
-                      isInvalid={!!errors?.difficulty_level}
-                    >
-                      <option value="">-- Select Difficulty --</option>
-                      {dropdownData.difficultyLevels.map((opt) => (
-                        <option key={opt.value} value={opt.value}>
-                          {opt.label}
-                        </option>
-                      ))}
-                    </Form.Select>
-                  )}
+                  render={({ field }) => {
+                    const { onChange, value, ref } = field;
+                    return (
+                      <Select
+                        inputRef={ref}
+                        isMulti
+                        isDisabled={!subTopic}
+                        options={dropdownData.subSubTopics.filter(
+                          (val) => val.sub_topic == subTopic
+                        )}
+                        value={dropdownData.subSubTopics.filter((option) =>
+                          value?.includes(option.value)
+                        )}
+                        onChange={(selectedOptions) =>
+                          onChange(
+                            selectedOptions.map((option) => option.value)
+                          )
+                        }
+                        classNamePrefix={
+                          errors.sub_sub_topic ? "is-invalid" : "select"
+                        }
+                      />
+                    );
+                  }}
                 />
                 <Form.Control.Feedback type="invalid">
-                  {errors?.difficulty_level?.message}
+                  {errors?.sub_sub_topic?.message}
                 </Form.Control.Feedback>
               </Form.Group>
             </Col>
@@ -733,7 +663,7 @@ export const QuestionModal = ({
           </Row>
 
           <Row className="mb-3">
-            <Col>
+            <Col md={6}>
               <Form.Label>Question Type:</Form.Label>
               <Controller
                 name="question_type"
@@ -753,40 +683,82 @@ export const QuestionModal = ({
                 {errors.question_type?.message}
               </Form.Control.Feedback>
             </Col>
+            <Col md={6}>
+              <Form.Group controlId={`difficulty_level`}>
+                <Form.Label>Difficulty:</Form.Label>
+                <Controller
+                  name={`difficulty_level`}
+                  control={control}
+                  render={({ field }) => (
+                    <Form.Select
+                      {...field}
+                      isInvalid={!!errors?.difficulty_level}
+                    >
+                      <option value="">-- Select Difficulty --</option>
+                      {dropdownData.difficultyLevels.map((opt) => (
+                        <option key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </option>
+                      ))}
+                    </Form.Select>
+                  )}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors?.difficulty_level?.message}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
           </Row>
 
           {question_type && (
             <>
-              {[
-                "MCQ_SINGLE",
-                "MCQ_MULTI",
-                "CODE",
-                "DESCRIPTIVE",
-                "FILL_BLANK",
-                "NUMERICAL",
-                "ORDERING",
-                "TRUE_FALSE",
-              ].includes(question_type) && (
-                <Row className="mb-3">
-                  <Col>
-                    <Form.Label>Question: </Form.Label>
-                    <Controller
-                      name="question_text"
-                      control={control}
-                      render={({ field }) => (
-                        <Form.Control
-                          as="textarea"
-                          rows={4}
-                          isInvalid={!!errors.question_text}
-                          {...field}
-                        />
-                      )}
-                    />
-                    <Form.Control.Feedback type="invalid">
-                      {errors.question_text?.message}
-                    </Form.Control.Feedback>
-                  </Col>
-                </Row>
+              {CONTAINS_QUESTION.includes(question_type) && (
+                <>
+                  <Row className="mb-3">
+                    <Col>
+                      <Form.Label>Question: </Form.Label>
+                      <Controller
+                        name="question_text"
+                        control={control}
+                        render={({ field }) => (
+                          <Form.Control
+                            as="textarea"
+                            rows={4}
+                            isInvalid={!!errors.question_text}
+                            {...field}
+                          />
+                        )}
+                      />
+                      <Form.Control.Feedback type="invalid">
+                        {errors.question_text?.message}
+                      </Form.Control.Feedback>
+                    </Col>
+                  </Row>
+                  {translateToBengali && (
+                    <Row>
+                      <Col>
+                        <Form.Group className="mt-3">
+                          <Form.Label>Translation in Bengali:</Form.Label>
+                          <Controller
+                            name="question_text_bn"
+                            control={control}
+                            render={({ field }) => (
+                              <Form.Control
+                                as="textarea"
+                                rows={4}
+                                isInvalid={!!errors.question_text_bn}
+                                {...field}
+                              />
+                            )}
+                          />
+                          <Form.Control.Feedback type="invalid">
+                            {errors.question_text_bn?.message}
+                          </Form.Control.Feedback>
+                        </Form.Group>
+                      </Col>
+                    </Row>
+                  )}
+                </>
               )}
 
               {question_type.includes("MCQ") && (
@@ -804,6 +776,7 @@ export const QuestionModal = ({
                     errors={errors}
                     control={control}
                     questionType={question_type}
+                    translateToBengali={translateToBengali}
                   />
                   {errors.correct_answer && (
                     <Form.Text className="text-danger">
@@ -833,7 +806,7 @@ export const QuestionModal = ({
           </Row>
           {fields.map((field, index) => {
             const filename = watch(`explanations.${index}.filename`);
-            const video = watch(`explanations.${index}.video`);
+            const video = watch(`explanations.${index}.video_url`);
 
             return (
               <div
@@ -904,7 +877,7 @@ export const QuestionModal = ({
                           variant="secondary"
                           size="sm"
                           onClick={() =>
-                            setValue(`explanations.${index}.video`, "")
+                            setValue(`explanations.${index}.video_url`, "")
                           }
                           className="ms-2"
                         >
@@ -922,13 +895,15 @@ export const QuestionModal = ({
                             onChange={(e) =>
                               handleVideoUpload(e.target.files[0], index)
                             }
-                            isInvalid={!!errors?.explanations?.[index]?.video}
+                            isInvalid={
+                              !!errors?.explanations?.[index]?.video_url
+                            }
                           />
                         )}
                       />
                     )}
                     <Form.Control.Feedback type="invalid">
-                      {errors?.explanations?.[index]?.video?.message}
+                      {errors?.explanations?.[index]?.video_url?.message}
                     </Form.Control.Feedback>
                   </Col>
                 </Row>
@@ -953,12 +928,30 @@ export const QuestionModal = ({
           </Row>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={onHide}>
-            Cancel
-          </Button>
-          <Button variant="primary" onClick={() => handleSubmit(onSubmit)()}>
-            {initialData ? "Save Changes" : "Add Question"}
-          </Button>
+          <div className="d-flex align-items-center w-100">
+            {/* Checkbox for Translation */}
+            <Form.Check
+              type="checkbox"
+              id="translateToBengali"
+              label="Translate to Bengali"
+              className="me-auto"
+              checked={translateToBengali}
+              onChange={(e) => setTranslateToBengali(e.target.checked)}
+            />
+
+            {/* Cancel and Add Question Buttons */}
+            <div>
+              <Button variant="secondary" onClick={onHide} className="me-2">
+                Cancel
+              </Button>
+              <Button
+                variant="primary"
+                onClick={() => handleSubmit(onSubmit)()}
+              >
+                {initialData ? "Save Changes" : "Add Question"}
+              </Button>
+            </div>
+          </div>
         </Modal.Footer>
       </Form>
     </Modal>
